@@ -12,12 +12,13 @@ public class CharacterController2D : MonoBehaviour
 	[SerializeField] private Transform m_CeilingCheck;							// A position marking where to check for ceilings
 	[SerializeField] private Collider2D m_CrouchDisableCollider;				// A collider that will be disabled when crouching
 
-	const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
-	public bool m_Grounded;            // Whether or not the player is grounded.
-	const float k_CeilingRadius = .2f; // Radius of the overlap circle to determine if the player can stand up
+	const float k_GroundedRadius = .1f; // Radius of the overlap circle to determine if grounded
+	private bool m_Grounded;            // Whether or not the player is grounded.
+	const float k_CeilingRadius = .05f; // Radius of the overlap circle to determine if the player can stand up
 	private Rigidbody2D m_Rigidbody2D;
 	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 	private Vector3 m_Velocity = Vector3.zero;
+	private Animator anim;
 
 	[Header("Events")]
 	[Space]
@@ -28,10 +29,11 @@ public class CharacterController2D : MonoBehaviour
 	public class BoolEvent : UnityEvent<bool> { }
 
 	public BoolEvent OnCrouchEvent;
-	private bool m_wasCrouching = false;
+	private bool m_wasCrouching;
 
 	private void Awake()
 	{
+		anim = GetComponent<Animator>();
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
 
 		if (OnLandEvent == null)
@@ -69,7 +71,8 @@ public class CharacterController2D : MonoBehaviour
 			// If the character has a ceiling preventing them from standing up, keep them crouching
 			if (Physics2D.OverlapCircle(m_CeilingCheck.position, k_CeilingRadius, m_WhatIsGround))
 			{
-				crouch = true;
+				if(m_wasCrouching)
+					crouch = true;
 			}
 		}
 
@@ -139,8 +142,9 @@ public class CharacterController2D : MonoBehaviour
 		m_FacingRight = !m_FacingRight;
 
 		// Multiply the player's x local scale by -1.
-		Vector3 theScale = transform.localScale;
+		/*Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
-		transform.localScale = theScale;
+		transform.localScale = theScale;*/
+		transform.Rotate(0, 180, 0);
 	}
 }

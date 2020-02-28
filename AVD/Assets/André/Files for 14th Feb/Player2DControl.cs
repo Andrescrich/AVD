@@ -1,4 +1,5 @@
 ﻿using System;
+using Cinemachine;
 using UnityEngine;
 
 public class Player2DControl : MonoBehaviour
@@ -9,11 +10,15 @@ public class Player2DControl : MonoBehaviour
     private bool crouch;
     private CharacterController2D controller;
     private Animator anim;
+    public GameObject bullet;
+    public Transform shootPoint;
+    private CinemachineImpulseSource cis;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController2D>();
         anim = GetComponent<Animator>();
+        cis = GetComponent<CinemachineImpulseSource>();
     }
     
     private void Update()
@@ -27,20 +32,33 @@ public class Player2DControl : MonoBehaviour
             anim.SetBool("IsJumping", true);
         }
 
-        if (Input.GetButtonDown("Crouch"))
+        if (Input.GetButton("Crouch"))
             crouch = true;
-        if (Input.GetButtonUp("Crouch"))
+        else
             crouch = false;
+        
+        if(Input.GetButtonDown("Fire1"))
+            Fire();
     }
 
     public void OnLanding()
     {
         anim.SetBool("IsJumping", false);
     }
+    
+    public void OnCrouching(bool isCrouching) {
+        anim.SetBool("IsCrouching", isCrouching);
+    }
 
     private void FixedUpdate()
     {
         controller.Move(horizontalMove * Time.fixedDeltaTime, crouch, jump);
         jump = false;
+    }
+
+    private void Fire()
+    {
+        cis.GenerateImpulse(Vector2.right);
+        Instantiate(bullet, shootPoint.position, shootPoint.rotation);
     }
 }
